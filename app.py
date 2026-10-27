@@ -48,4 +48,45 @@ def request_ride():
     #response back to browser
   return jsonify({"status": "success","message": (f"Success! Driver assigned for your pickup at {pickup_location}."),})
 
+@lycoride.route("/api/reverse")
+def reverse():
+    try:
+        lng = float(request.args["lng"]); lat = float(request.args["lat"])
+    except (KeyError, ValueError):
+        return jsonify({"error": "Missing lng/lat"}), 400
+    try:
+        r = requests.get(
+            f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lng},{lat}.json",
+            params={"access_token": os.getenv("MAPBOX_TOKEN"), "limit": 1},
+            timeout=8,
+        )
+    except requests.RequestException:
+        return jsonify({"error": "Could not reach Mapbox"}), 502
+    feats = r.json().get("features", []) if r.ok else []
+    return jsonify({"name": feats[0]["place_name"] if feats else "Dropped pin"})
+
+@lycoride.route("/api/route")
+def route():
+    try:
+        a_lng, a_lat = request.args["from"].split(",")
+        b_lng, b_lat = request.args["to"].split(",")
+        float(a_lng), float(a_lat), float(b_lng), float(b_lat)
+    except (KeyError, ValueError):
+        return jsonify({"error": "Use ?from=lng,lat&to=lng,lat"}), 400
+    try:
+        r = requests.get(
+            f"https://router.project-osrm.org/route/v1/driving/{a_lng},{a_lat};{b_lng},{b_lat}",
+            params={"overview": "full", "geometries": "geojson"},
+            timeout=8,
+        )
+    except requests.RequestException:
+        return jsonify({"error": "Could not reach routing service"}), 502
+    data = r.json()
+    if not r.ok or not data.get("routes"):
+        return jsonify({"error": "No route found"}), 404
+    rt = data["routes"][0]
+    return jsonify({"km": round(rt["distance"] / 1000, 1),
+                    "minutes": round(rt["duration"] / 60),
+                    "geometry": rt["geometry"]})
+
 lycoride.run(host="0.0.0.0", port=5000, debug=True)
