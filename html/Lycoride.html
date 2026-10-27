@@ -10,7 +10,7 @@
 :root{
   --bg:#fff; --card:#fff; --panel:#fff; --white:#fff;
   --maroon:#8B0000; --maroon-d:#5c0000; --maroon-l:#b05555;
-  --orange:#8B0000;            /* old "orange" accent now maroon, so every component follows */
+  --orange:#8B0000;
   --teal:#4EA3AB; --navy:#2B4C7E; --green:#4CFF4C;
   --muted:#7a5c5c; --line:#eadada; --bar:#8B0000;
   --shadow:0 6px 14px rgba(0,0,0,.18);
@@ -34,7 +34,7 @@ input{font:inherit;color:inherit}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .center{display:grid;place-items:center;min-height:calc(100vh - 44px);padding:20px}
 
-/* maroon full-bleed screens (splash / login) , white page for auth + terms */
+
 #splash,#login{background:var(--maroon)}
 
 /* buttons */
@@ -182,7 +182,7 @@ body.dark .n{background:var(--card);color:#f3dcdc}
 .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:var(--maroon);color:#fff;border-radius:99px;padding:12px 24px;font-family:'Chakra Petch';font-weight:700;transition:.3s;z-index:99;max-width:92vw;text-align:center}
 .toast.on{transform:translate(-50%,0)}
 
-/* ===== TABLET ===== */
+/*TABLET*/
 @media (max-width:1100px){
   .shell{grid-template-columns:200px 1fr}
   .grid3{gap:14px}
@@ -190,7 +190,7 @@ body.dark .n{background:var(--card);color:#f3dcdc}
   .nav{font-size:15px;padding:16px 12px}
 }
 
-/* ===== MOBILE / SMALL TABLET ===== */
+/*MOBILE/SMALL TABLET*/
 @media (max-width:900px){
   .shell{display:flex;flex-direction:column;min-height:calc(100vh - 44px)}
   .head{order:1;flex-wrap:wrap;padding:12px;gap:10px;justify-content:flex-start}
@@ -316,7 +316,7 @@ body.dark .n{background:var(--card);color:#f3dcdc}
 
 <script>
 const MAPBOX_TOKEN="{{ mapbox_token }}";
-/* ---------- helpers ---------- */
+
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const store={get(k,d){try{return JSON.parse(localStorage.getItem('lr_'+k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem('lr_'+k,JSON.stringify(v))}catch(e){}}};
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
@@ -336,7 +336,6 @@ const LOGO=`<svg viewBox="0 0 200 200" width="190" height="190" aria-label="Lyco
 const MASCOT=`<svg viewBox="0 0 100 100" width="70" height="70"><path d="M50 12c-18 0-28 12-28 28 0 8 3 14 6 20-3 6-3 14 4 20h36c-6-8-6-14-2-18 4-6 6-12 6-22 0-16-10-28-22-28z" fill="#fff"/><circle cx="58" cy="38" r="3" fill="#212121"/><path d="M35 62q15 18 36 0M40 70q12 12 28 0" fill="none" stroke="#212121" stroke-width="3"/></svg>`;
 $$('.logoSvg').forEach(e=>e.innerHTML=LOGO);
 
-/* ---------- data / state ---------- */
 let PLACES=[];
 const ME={lat:14.2905,lng:120.9158}; 
 const MAX_KM=40;   
@@ -359,7 +358,7 @@ let S={mode:'Student',email:store.get('email',''),user:store.get('user',null),de
 function save(){store.set('profile',S.profile);store.set('settings',S.settings);store.set('trips',S.trips);store.set('notifs',S.notifs);store.set('user',S.user)}
 function addNotif(t,b){if(!S.settings.notif)return;S.notifs.unshift({t,b,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});save();renderNotifs()}
 
-/* ---------- router ---------- */
+/*router*/
 const PUBLIC=['splash','login','auth','terms'];
 function nav(id){location.hash='#'+id}
 function show(id){
@@ -378,7 +377,7 @@ function route(){
   show(id);
 }
 
-/* ---------- build app pages ---------- */
+/*build app pages*/
 const SHELL=(id,inner)=>`
 <section class="screen" id="${id}"><div class="shell">
  <aside class="side">
@@ -456,7 +455,7 @@ const TITLES={};
 $('#appPages').innerHTML=Object.entries(PAGES).map(([id,html])=>SHELL(id,html)).join('');
 PAGES&&0;
 
-/* ---------- splash & login ---------- */
+/*splash&login*/
 $('#modePill').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.mode=b.dataset.mode;$$('#modePill button').forEach(x=>x.classList.toggle('act',x===b))};
 $('#eye').onclick=()=>{const p=$('#pass');p.type=p.type==='password'?'text':'password'};
 $('#forgot').onclick=()=>{const m=$('#email').value.trim();if(!/^\S+@\S+\.\S+$/.test(m)){$('#loginErr').textContent='Enter your email first, then tap Forgot password.';return}$('#loginErr').textContent='';toast('Reset link sent to '+m)};
@@ -467,7 +466,7 @@ $('#loginForm').onsubmit=e=>{e.preventDefault();
   $('#loginErr').textContent='';S.email=m;store.set('email',m);nav('auth')};
 $('#outlook').onclick=()=>{const m=$('#email').value.trim();S.email=/^\S+@\S+\.\S+$/.test(m)?m:'outlook.user@outlook.com';store.set('email',S.email);toast('Signed in with Outlook (demo)');nav('auth')};
 
-/* ---------- auth ---------- */
+/*auth*/
 const otp=$$('#otp input');
 otp.forEach((i,idx)=>{
   i.addEventListener('input',()=>{i.value=i.value.replace(/\D/g,'');if(i.value&&otp[idx+1])otp[idx+1].focus()});
@@ -483,7 +482,6 @@ $('#authOk').onclick=()=>{
   save();toast('Welcome, '+S.profile.name+'!');nav('dashboard')};
 $('#termsBack').onclick=()=>nav(S.user?'settings':'login');
 
-/* ---------- global delegated actions ---------- */
 document.addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(g){nav(g.dataset.go);return}
   const a=e.target.closest('[data-act]');if(!a)return;
@@ -502,7 +500,7 @@ document.addEventListener('submit',e=>{
 function applyTheme(){document.body.classList.toggle('dark',!!S.settings.dark)}
 $('#logoutBtn').onclick=()=>{closeModal('profModal');S.user=null;S.dest=S.driver=S.trip=null;save();toast('Logged out');nav('login')};
 
-/* ---------- notifications ---------- */
+/*notif*/
 function toggleNotif(){$('#notif').classList.toggle('on')}
 function renderNotifs(){
   $('#notifList').innerHTML=S.notifs.length?S.notifs.map(n=>`<div class="n"><b>${n.t}</b><div style="margin:4px 0">${n.b}</div><small style="opacity:.7">${n.time}</small></div>`).join(''):'<div class="hint">No notifications</div>';
@@ -510,7 +508,6 @@ function renderNotifs(){
 }
 function clearNotifs(){S.notifs=[];save();renderNotifs()}
 
-/* ---------- render per screen ---------- */
 const RENDER={
 dashboard(){
   const n=S.trips.length,sp=S.trips.reduce((a,t)=>a+t.fare,0),km=S.trips.reduce((a,t)=>a+t.km,0);
@@ -621,6 +618,17 @@ function initMap(){
   box.innerHTML='';
   MAP=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/streets-v12',center:[ME.lng,ME.lat],zoom:9.5});
   MAP.addControl(new mapboxgl.NavigationControl());
+  MAP.on('click',async e=>{
+  const {lng,lat}=e.lngLat;
+  const km=distKm(ME.lat,ME.lng,lat,lng);
+  if(km>MAX_KM){toast('Too far. Maximum ride is '+MAX_KM+' km.');return}
+  let name='Dropped pin';
+  try{const r=await fetch(`/api/reverse?lng=${lng}&lat=${lat}`);const d=await r.json();if(r.ok&&d.name)name=d.name}catch(_){}
+  const p={id:'c'+Date.now(),name,icon:'📍',lat,lng,km};
+  PLACES.push(p);
+  drawPlaces(true);          // true = don't re-zoom the map
+  selectPlace(p.id,true);    // draws the route and opens the confirm popup
+});
   MAP.on('error',()=>{toast('Map error. Check token or connection.')});
   
   new mapboxgl.Marker({color:'#2b7fff'}).setLngLat([ME.lng,ME.lat]).setPopup(new mapboxgl.Popup().setText('LPU Gen. Trias (pickup point)')).addTo(MAP);
@@ -635,33 +643,198 @@ function initMap(){
     MAP.addLayer({id:'radius-line',type:'line',source:'radius',paint:{'line-color':'#FFA630','line-width':2,'line-dasharray':[2,2]}});
   });
 }
-function drawPlaces(){
-  $('#placeResults').innerHTML=PLACES.map(p=>`<div class="place" data-p="${p.id}"><div class="ic">${p.icon}</div><div><b class="f" style="font-size:14px">${p.name}</b><div class="hint" style="text-align:left">${p.km} km · ≈ ${money(fare(p.km,1))}</div></div></div>`).join('');
-  $$('[data-p]').forEach(el=>el.onclick=()=>selectPlace(el.dataset.p,true));
-  if(!MAP) return;
-  MARKERS.forEach(m=>m.remove());MARKERS=[];
-  if(!PLACES.length) return;
-  const bounds=new mapboxgl.LngLatBounds([ME.lng,ME.lat],[ME.lng,ME.lat]);
-  PLACES.forEach(p=>{
-    const m=new mapboxgl.Marker({color:'#FFA630'}).setLngLat([p.lng,p.lat]).setPopup(new mapboxgl.Popup().setText(p.name)).addTo(MAP);
-    m.getElement().addEventListener('click',()=>selectPlace(p.id,true));
-    MARKERS.push(m);bounds.extend([p.lng,p.lat]);
+
+function drawPlaces() {
+  // Find the destination results container.
+  const results = $('#placeResults');
+
+  if (!results) {
+    console.error(
+      'Missing #placeResults element. Check your HTML for id="placeResults".'
+    );
+  } else {
+    results.innerHTML = PLACES.map(p => `
+      <div class="place" data-p="${p.id}">
+        <div class="ic">${p.icon}</div>
+        <div>
+          <b class="f" style="font-size:14px">${p.name}</b>
+          <div class="hint" style="text-align:left">
+            ${p.km} km · ≈ ${money(fare(p.km, 1))}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    results.querySelectorAll('[data-p]').forEach(el => {
+      el.onclick = () => selectPlace(el.dataset.p, true);
+    });
+  }
+
+  if (!MAP) return;
+
+  // Remove old destination markers.
+  MARKERS.forEach(m => m.remove());
+  MARKERS = [];
+
+  if (!PLACES.length) return;
+
+  const bounds = new mapboxgl.LngLatBounds(
+    [ME.lng, ME.lat],
+    [ME.lng, ME.lat]
+  );
+
+  PLACES.forEach(p => {
+    const marker = new mapboxgl.Marker({ color: '#FFA630' })
+      .setLngLat([p.lng, p.lat])
+      .setPopup(new mapboxgl.Popup().setText(p.name))
+      .addTo(MAP);
+
+    marker.getElement().addEventListener('click', () => {
+      selectPlace(p.id, true);
+    });
+
+    MARKERS.push(marker);
+    bounds.extend([p.lng, p.lat]);
   });
-  MAP.fitBounds(bounds,{padding:60,maxZoom:15});
+
+  MAP.fitBounds(bounds, {
+    padding: 60,
+    maxZoom: 15
+  });
 }
+
 
 /* ----------  test zzzz up only---------- */
 
 /* ---------- ride flow ---------- */
 function fare(km,m){return Math.round((50+km*14)*m)}
-function selectPlace(id,open){
-const p=PLACES.find(x=>x.id===id);if(!p)return;
-if(p.km>MAX_KM){toast('Too far. Maximum ride is '+MAX_KM+' km.');return}
-S.dest=p;
- 
-  $$('[data-p]').forEach(el=>el.classList.toggle('sel',el.dataset.p===id));
-  if(open){$('#confirmText').innerHTML=`<b class="f" style="font-size:20px">${p.icon} ${p.name}</b><div>${p.km} km · estimated fare from <b>${money(fare(p.km,.95))}</b></div>`;openModal('confirmModal')}
+
+async function getRoute(p) {
+  try {
+    if (!MAP || !p || !ME) {
+      console.error('Map, pickup, or destination is missing.');
+      return;
+    }
+
+    const url =
+      `/api/route?from=${ME.lng},${ME.lat}` +
+      `&to=${p.lng},${p.lat}`;
+
+    const r = await fetch(url);
+    const d = await r.json();
+
+    if (!r.ok) {
+      throw new Error(d.error || `Route API failed: ${r.status}`);
+    }
+
+    if (
+      !d.geometry ||
+      d.geometry.type !== 'LineString' ||
+      !Array.isArray(d.geometry.coordinates) ||
+      d.geometry.coordinates.length < 2
+    ) {
+      throw new Error('Invalid or missing route geometry.');
+    }
+
+    // Save the road distance.
+    p.km = d.km;
+
+    // Wait until the map style is ready.
+    if (!MAP.isStyleLoaded()) {
+      await new Promise((resolve) => {
+        MAP.once('load', resolve);
+      });
+    }
+
+    // Remove the previous route.
+    if (MAP.getLayer('route')) {
+      MAP.removeLayer('route');
+    }
+
+    if (MAP.getSource('route')) {
+      MAP.removeSource('route');
+    }
+
+    // Add the new route.
+    MAP.addSource('route', {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        properties: {},
+        geometry: d.geometry
+      }
+    });
+
+    MAP.addLayer({
+      id: 'route',
+      type: 'line',
+      source: 'route',
+      layout: {
+        'line-cap': 'round',
+        'line-join': 'round'
+      },
+      paint: {
+        'line-color': '#8B0000',
+        'line-width': 5,
+        'line-opacity': 1
+      }
+    });
+
+    // Zoom to show the whole route.
+    const coords = d.geometry.coordinates;
+    const bounds = coords.reduce(
+      (b, coord) => b.extend(coord),
+      new mapboxgl.LngLatBounds(coords[0], coords[0])
+    );
+
+    MAP.fitBounds(bounds, {
+      padding: 60,
+      maxZoom: 14,
+      duration: 800
+    });
+
+    console.log('Route drawn successfully. Distance:', d.km, 'km');
+
+  } catch (e) {
+    console.error('getRoute failed:', e);
+    if (typeof toast === 'function') {
+      toast('Could not draw route. Check the browser console.');
+    }
+  }
 }
+
+
+async function selectPlace(id, open) {
+  const p = PLACES.find(x => x.id === id);
+  if (!p) return;
+
+  if (p.km > MAX_KM) {
+    toast('Too far. Maximum ride is ' + MAX_KM + ' km.');
+    return;
+  }
+
+  S.dest = p;
+
+  $$('[data-p]').forEach(el => {
+    el.classList.toggle('sel', el.dataset.p === id);
+  });
+
+  // Fetch and draw the driving route
+  await getRoute(p);
+
+  // Refresh the displayed distance and fare
+  drawPlaces();
+
+  if (open) {
+    $('#confirmText').innerHTML =
+      `<b class="f" style="font-size:20px">${p.icon} ${p.name}</b>
+       <div>${p.km} km · estimated fare from
+       <b>${money(fare(p.km, .95))}</b></div>`;
+
+    openModal('confirmModal');
+  }
+}
+
 $('#confirmGo').onclick=()=>{closeModal('confirmModal');S.driver=null;nav('drivers')};
 $('#drvGo').onclick=()=>{if(!S.driver){toast('Please select a driver first');return}addNotif('Driver requested',S.driver.name+' is heading to you.');nav('waiting')};
 $('#waitCancel').onclick=()=>{clearInterval(RENDER.tm);S.driver=null;addNotif('Ride cancelled','You cancelled your ride. No charge.');toast('Ride cancelled');nav('dashboard')};
